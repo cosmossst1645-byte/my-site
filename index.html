@@ -14,6 +14,7 @@
             --accent-green: #2ecc71;
             --accent-blue: #38bdf8;
             --copper-accent: #d97706;
+            --neon-red: #ff2a2a;
             --text-dark: #0f172a;
             --border-black: #1e293b;
             --card-shadow: 5px 5px 0px #1e293b;
@@ -63,7 +64,7 @@
             to { stroke-dashoffset: 0; }
         }
 
-        /* LANDING SCREEN (A E I E PCB IC CHIP) */
+        /* LANDING SCREEN */
         #landing-screen {
             display: flex;
             flex-direction: column;
@@ -103,10 +104,7 @@
             border-radius: 2px;
         }
 
-        .ic-pins.bottom {
-            top: auto;
-            bottom: -12px;
-        }
+        .ic-pins.bottom { top: auto; bottom: -12px; }
 
         .aeie-logo {
             font-size: 3rem;
@@ -117,11 +115,6 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-        }
-
-        .ic-chip:active {
-            transform: translate(4px, 4px);
-            box-shadow: 3px 3px 0px var(--border-black);
         }
 
         .power-led {
@@ -154,31 +147,80 @@
             box-shadow: 3px 3px 0px var(--border-black);
         }
 
-        /* HEADER */
+        /* HEADER & CLOCK CARDS */
         header {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             background: var(--matcha-bg);
             border: 2.5px solid var(--border-black);
             box-shadow: var(--card-shadow);
             border-radius: var(--radius);
-            padding: 14px;
+            padding: 12px;
         }
 
-        header h1 {
-            font-size: 1.15rem;
+        header h1 { font-size: 1.1rem; text-transform: uppercase; }
+        header p { font-size: 0.78rem; font-weight: 700; color: #2d6a4f; margin-top: 2px; }
+
+        /* BRIGHT RED END-SEM COUNTDOWN CARD */
+        .exam-countdown-card {
+            background: #111827;
+            border: 2.5px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .exam-title {
+            color: #f8fafc;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
-        header p {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #2d6a4f;
+        .exam-timer {
+            color: var(--neon-red);
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(255, 42, 42, 0.6);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* LIVE NEXT CLASS TRACKER CARD */
+        .live-status-card {
+            background: var(--skyblue-card);
+            border: 2.5px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .status-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-bottom: 4px;
+        }
+
+        .status-main {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .status-timer {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0369a1;
+            margin-top: 2px;
         }
 
         /* TOGGLE BUTTONS */
@@ -186,7 +228,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .group-btn {
@@ -227,10 +269,7 @@
         }
 
         /* DAYS MENU GRID */
-        .days-grid {
-            display: grid;
-            gap: 12px;
-        }
+        .days-grid { display: grid; gap: 12px; }
 
         .pcb-day-card {
             position: relative;
@@ -267,7 +306,6 @@
             box-shadow: 2px 2px 0px var(--border-black);
         }
 
-        /* CIRCUIT POWER-ON ANIMATION */
         .circuit-connecting {
             animation: pcbPowerOn 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -302,13 +340,7 @@
             box-shadow: 0 0 5px var(--accent-green);
         }
 
-        .slot-time {
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: #1b4332;
-            margin-bottom: 2px;
-        }
-
+        .slot-time { font-size: 0.75rem; font-weight: 800; color: #1b4332; margin-bottom: 2px; }
         .slot-title { font-size: 0.95rem; font-weight: 800; padding-right: 16px; }
         .slot-meta { font-size: 0.78rem; font-weight: 700; color: #334155; margin-top: 2px; }
 
@@ -332,7 +364,6 @@
             margin-bottom: 14px;
         }
 
-        /* VISIBILITY CONTROLS */
         .hidden { display: none !important; }
         .gr1-only, .gr2-only { display: none; }
         body.show-gr1 .gr1-only { display: block; }
@@ -341,16 +372,16 @@
 </head>
 <body class="show-gr1">
 
-    <!-- ANIMATED BACKGROUND PCB SVG TRACES -->
+    <!-- BACKGROUND TRACES -->
     <svg class="circuit-bg" xmlns="http://www.w3.org/2000/svg">
         <path class="circuit-path" d="M 20 10 L 20 150 L 80 210 L 80 400 M 300 50 L 300 250 L 200 350 L 200 700 M 100 800 L 250 800 L 350 900" />
         <circle cx="80" cy="210" r="4" fill="#1e293b" />
         <circle cx="200" cy="350" r="4" fill="#1e293b" />
     </svg>
 
-    <!-- 1. LANDING SCREEN (PCB IC CHIP VIEW) -->
+    <!-- 1. LANDING SCREEN -->
     <div id="landing-screen">
-        <div class="ic-chip" id="aeie-chip" role="button" tabindex="0">
+        <div class="ic-chip" id="aeie-chip">
             <div class="ic-pins"><div class="pin"></div><div class="pin"></div><div class="pin"></div><div class="pin"></div></div>
             <div class="aeie-logo">
                 A E I E
@@ -368,6 +399,22 @@
             <h1>Heritage Institute of Technology</h1>
             <p>AEIE • 1st Year 1st Sem <span class="power-led on"></span></p>
         </header>
+
+        <!-- BRIGHT RED END-SEM COUNTDOWN BANNER -->
+        <div class="exam-countdown-card">
+            <div class="exam-title">🚨 END-SEM EXAM COUNTDOWN 🚨</div>
+            <div class="exam-timer" id="exam-timer-display">--d --h --m --s</div>
+        </div>
+
+        <!-- LIVE NEXT CLASS & TIME COUNTDOWN CARD -->
+        <div class="live-status-card">
+            <div class="status-header">
+                <span>⏱️ REAL-TIME SYSTEM SYNC</span>
+                <span id="live-clock-time">00:00:00</span>
+            </div>
+            <div class="status-main" id="live-class-status">Scanning routine...</div>
+            <div class="status-timer" id="live-class-countdown">Updating...</div>
+        </div>
 
         <div class="toggle-container">
             <button class="group-btn active" id="btn-gr1" type="button">Group 1</button>
@@ -649,60 +696,4 @@
             };
 
             function triggerAnim(el) {
-                el.classList.remove('circuit-connecting');
-                void el.offsetWidth;
-                el.classList.add('circuit-connecting');
-            }
-
-            chip.addEventListener('click', function () {
-                led.classList.add('on');
-                setTimeout(function () {
-                    landing.classList.add('hidden');
-                    app.classList.remove('hidden');
-                    daysMenu.classList.remove('hidden');
-                    detailView.classList.add('hidden');
-                    triggerAnim(app);
-                }, 220);
-            });
-
-            btn1.addEventListener('click', function () {
-                document.body.className = 'show-gr1';
-                btn1.classList.add('active');
-                btn2.classList.remove('active');
-            });
-
-            btn2.addEventListener('click', function () {
-                document.body.className = 'show-gr2';
-                btn2.classList.add('active');
-                btn1.classList.remove('active');
-            });
-
-            document.querySelectorAll('.pcb-day-card').forEach(function (card) {
-                card.addEventListener('click', function () {
-                    const dayId = card.getAttribute('data-day');
-                    daysMenu.classList.add('hidden');
-                    detailView.classList.remove('hidden');
-
-                    document.querySelectorAll('.day-content').forEach(function (d) {
-                        d.classList.add('hidden');
-                    });
-
-                    const selected = document.getElementById('day-' + dayId);
-                    if (selected) {
-                        selected.classList.remove('hidden');
-                    }
-
-                    dayTitleEl.textContent = dayNames[dayId] || '';
-                    triggerAnim(detailView);
-                });
-            });
-
-            backBtn.addEventListener('click', function () {
-                detailView.classList.add('hidden');
-                daysMenu.classList.remove('hidden');
-                triggerAnim(daysMenu);
-            });
-        })();
-    </script>
-</body>
-</html>
+                el.classList.
