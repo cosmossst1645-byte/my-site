@@ -1,1 +1,635 @@
-# my-site
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEIE PCB Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f2faf5;
+            --matcha-bg: #d8f3dc;
+            --matcha-card: #e8f5e9;
+            --skyblue-bg: #e0f2fe;
+            --skyblue-card: #f0f9ff;
+            --accent-green: #2ecc71;
+            --accent-blue: #38bdf8;
+            --copper-accent: #d97706;
+            --text-dark: #0f172a;
+            --border-black: #1e293b;
+            --card-shadow: 5px 5px 0px #1e293b;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ANIMATED CIRCUIT TRACE BACKGROUND SVG */
+        .circuit-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.25;
+        }
+
+        .circuit-path {
+            stroke: #1b4332;
+            stroke-width: 2.5;
+            fill: none;
+            stroke-dasharray: 10, 10;
+            animation: traceFlow 12s linear infinite;
+        }
+
+        @keyframes traceFlow {
+            from { stroke-dashoffset: 200; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* LANDING SCREEN (A E I E PCB IC CHIP) */
+        #landing-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 85vh;
+            text-align: center;
+        }
+
+        .ic-chip {
+            position: relative;
+            background: var(--skyblue-bg);
+            border: 3.5px solid var(--border-black);
+            box-shadow: 7px 7px 0px var(--border-black);
+            padding: 28px 36px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .ic-chip::before, .ic-chip::after {
+            content: '';
+            position: absolute;
+            background: var(--border-black);
+        }
+
+        /* PCB Pins on Landing Chip */
+        .ic-pins {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            position: absolute;
+            top: -12px;
+        }
+        .pin {
+            width: 8px;
+            height: 12px;
+            background: var(--copper-accent);
+            border: 2px solid var(--border-black);
+            border-radius: 2px;
+        }
+        .ic-pins.bottom { top: auto; bottom: -12px; }
+
+        .aeie-logo {
+            font-size: 3.2rem;
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ic-chip:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px var(--border-black);
+        }
+
+        .power-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            border: 2px solid var(--border-black);
+            display: inline-block;
+            box-shadow: 0 0 6px #ef4444;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .power-led.on {
+            background: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .tap-hint {
+            margin-top: 24px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #334155;
+            letter-spacing: 1px;
+            background: var(--matcha-bg);
+            border: 2px solid var(--border-black);
+            padding: 6px 14px;
+            border-radius: 20px;
+            box-shadow: 3px 3px 0px var(--border-black);
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 16px;
+            background: var(--matcha-bg);
+            border: 2.5px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: var(--radius);
+            padding: 14px;
+            position: relative;
+        }
+
+        header h1 { font-size: 1.15rem; text-transform: uppercase; }
+        header p { font-size: 0.78rem; font-weight: 700; color: #2d6a4f; }
+
+        /* TOGGLE BUTTONS */
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .group-btn {
+            background: #ffffff;
+            border: 2.5px solid var(--border-black);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--border-black);
+            transition: all 0.2s ease;
+        }
+
+        .group-btn.active {
+            background: var(--accent-blue);
+            color: #fff;
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--border-black);
+        }
+
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .back-btn {
+            background: var(--matcha-bg);
+            border: 2.5px solid var(--border-black);
+            box-shadow: 3px 3px 0px var(--border-black);
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* DAYS MENU GRID */
+        .days-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .pcb-day-card {
+            position: relative;
+            background: var(--skyblue-card);
+            border: 2.5px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: var(--radius);
+            padding: 16px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* PCB Corner Solder Nodes */
+        .pcb-day-card::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--copper-accent);
+            border: 1.5px solid var(--border-black);
+            border-radius: 50%;
+        }
+
+        .pcb-day-card:active {
+            transform: translate(3px, 3px);
+            box-shadow: 2px 2px 0px var(--border-black);
+        }
+
+        /* CIRCUIT POWER-ON ANIMATION ON DAY CLICK */
+        .circuit-connecting {
+            animation: pcbPowerOn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes pcbPowerOn {
+            0% { opacity: 0.3; filter: brightness(0.7); transform: scale(0.98); }
+            50% { opacity: 0.8; filter: brightness(1.3); }
+            100% { opacity: 1; filter: brightness(1); transform: scale(1); }
+        }
+
+        /* CLASS SLOTS */
+        .slot {
+            position: relative;
+            background: var(--matcha-card);
+            border: 2.5px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .slot::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 4px var(--accent-green);
+        }
+
+        .slot-time {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #1b4332;
+            margin-bottom: 2px;
+        }
+
+        .slot-title { font-size: 0.95rem; font-weight: 800; }
+        .slot-meta { font-size: 0.78rem; font-weight: 700; color: #334155; margin-top: 2px; }
+
+        .slot-desc {
+            font-size: 0.78rem;
+            color: #475569;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1.5px dashed var(--border-black);
+            line-height: 1.35;
+        }
+
+        .break-slot {
+            background: #fff;
+            border: 2px dashed var(--border-black);
+            text-align: center;
+            padding: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            border-radius: 12px;
+            margin-bottom: 14px;
+        }
+
+        .hidden { display: none !important; }
+        .gr1-only, .gr2-only { display: none; }
+        body.show-gr1 .gr1-only { display: block; }
+        body.show-gr2 .gr2-only { display: block; }
+    </style>
+</head>
+<body class="show-gr1">
+
+    <!-- ANIMATED BACKGROUND PCB SVG TRACES -->
+    <svg class="circuit-bg" xmlns="http://www.w3.org/2000/svg">
+        <path class="circuit-path" d="M 20 10 L 20 150 L 80 210 L 80 400 M 300 50 L 300 250 L 200 350 L 200 700 M 100 800 L 250 800 L 350 900" />
+        <circle cx="80" cy="210" r="4" fill="#1e293b" />
+        <circle cx="200" cy="350" r="4" fill="#1e293b" />
+    </svg>
+
+    <!-- 1. LANDING SCREEN (PCB IC CHIP VIEW) -->
+    <div id="landing-screen">
+        <div class="ic-chip" onclick="bootSystem()">
+            <div class="ic-pins"><div class="pin"></div><div class="pin"></div><div class="pin"></div><div class="pin"></div></div>
+            <div class="aeie-logo">
+                A E I E
+                <span class="power-led" id="main-led"></span>
+            </div>
+            <div class="ic-pins bottom"><div class="pin"></div><div class="pin"></div><div class="pin"></div><div class="pin"></div></div>
+        </div>
+        <div class="tap-hint">⚡ CLICK CHIP TO POWER ON</div>
+    </div>
+
+    <!-- MAIN APP CONTENT -->
+    <div id="app-content" class="hidden">
+        
+        <header>
+            <h1>Heritage Institute of Technology</h1>
+            <p>Applied Electronics & Instrumentation Engg <span class="power-led on"></span></p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="group-btn active" id="btn-gr1" onclick="setGroup(1)">Group 1</button>
+            <button class="group-btn" id="btn-gr2" onclick="setGroup(2)">Group 2</button>
+        </div>
+
+        <!-- 2. DAYS MENU SCREEN -->
+        <div id="days-menu-view">
+            <div style="font-weight: 800; margin-bottom: 12px; font-size: 1rem; display:flex; align-items:center; gap:6px;">
+                <span>🔌 SELECT DAY NODE:</span>
+            </div>
+            <div class="days-grid">
+                <div class="pcb-day-card" onclick="openDay('mon')">Monday <span>⚡ ➔</span></div>
+                <div class="pcb-day-card" onclick="openDay('tue')">Tuesday <span>⚡ ➔</span></div>
+                <div class="pcb-day-card" onclick="openDay('wed')">Wednesday <span>⚡ ➔</span></div>
+                <div class="pcb-day-card" onclick="openDay('thu')">Thursday <span>⚡ ➔</span></div>
+                <div class="pcb-day-card" onclick="openDay('fri')">Friday <span>⚡ ➔</span></div>
+            </div>
+        </div>
+
+        <!-- 3. DAY CLASSES DETAIL VIEW -->
+        <div id="day-detail-view" class="hidden">
+            <div class="nav-bar">
+                <button class="back-btn" onclick="backToDaysMenu()">⬅ Back to Nodes</button>
+                <span id="current-day-title" style="font-weight: 800; font-size: 1.05rem;"></span>
+            </div>
+
+            <div id="classes-container">
+                
+                <!-- MONDAY -->
+                <div id="day-mon" class="day-content hidden">
+                    <div class="slot">
+                        <div class="slot-time">09:00 AM - 10:00 AM</div>
+                        <div class="slot-title">ELE1001 • Basic Electrical Engg</div>
+                        <div class="slot-meta">Prof. Anirban Kolay (AK) • Room ICT004</div>
+                        <div class="slot-desc">📌 Covers fundamentals of DC/AC circuits, Kirchhoff's laws, electromagnetic induction, transformers, and basic power concepts.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">10:00 AM - 11:00 AM</div>
+                        <div class="slot-title">MTH1101 • Mathematics-IB</div>
+                        <div class="slot-meta">Prof. Dr. Sudipta Sarkar (SDS) • Room ICT004</div>
+                        <div class="slot-desc">📌 Focuses on differential calculus, multivariable functions, sequence and series convergence, and partial derivatives.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">11:00 AM - 12:00 PM</div>
+                        <div class="slot-title">HUM1001 • English</div>
+                        <div class="slot-meta">Prof. Koyel Mallick (KM) • Room ICT004</div>
+                        <div class="slot-desc">📌 Enhances professional communication skills, technical writing, vocabulary building, and formal presentation grammar.</div>
+                    </div>
+                    <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+                    <div class="slot">
+                        <div class="slot-time">01:00 PM - 02:00 PM</div>
+                        <div class="slot-title">MTH1101 • Mathematics-IB</div>
+                        <div class="slot-meta">Prof. Dr. Ashesh Paul (AP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Analytical problem solving in integral calculus, double/triple integrals, and vector differential calculus.</div>
+                    </div>
+                    <div class="slot gr1-only">
+                        <div class="slot-time">02:00 PM - 03:00 PM</div>
+                        <div class="slot-title">Mentoring Session</div>
+                        <div class="slot-desc">📌 One-on-one student-faculty guidance regarding academic progress, campus adjustment, and goals.</div>
+                    </div>
+                    <div class="slot gr1-only">
+                        <div class="slot-time">03:00 PM - 04:00 PM</div>
+                        <div class="slot-title">Library Hour</div>
+                        <div class="slot-desc">📌 Self-directed study session for reading textbooks, reference journals, or completing assignments.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">02:00 PM - 05:00 PM</div>
+                        <div class="slot-title">CSE1051 • C Programming Lab</div>
+                        <div class="slot-meta">ANP / SBJ / SKD • Room ICTB01</div>
+                        <div class="slot-desc">📌 Hands-on lab session writing C code: loops, arrays, pointers, structures, functions, and debugging on systems.</div>
+                    </div>
+                </div>
+
+                <!-- TUESDAY -->
+                <div id="day-tue" class="day-content hidden">
+                    <div class="slot gr1-only">
+                        <div class="slot-time">09:00 AM - 12:00 PM</div>
+                        <div class="slot-title">CHM1051 • Chemistry Lab</div>
+                        <div class="slot-meta">Prof. Piyali Paul (PP) / HS • Room CB101</div>
+                        <div class="slot-desc">📌 Practical experiments on titrations, water hardness testing, pH measurements, and chemical synthesis.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">09:00 AM - 12:00 PM</div>
+                        <div class="slot-title">CHM1051 • Chemistry Lab</div>
+                        <div class="slot-meta">Prof. Sangeeta Ghosh (SG) / SKM • Room CB102</div>
+                        <div class="slot-desc">📌 Practical experiments on titrations, water hardness testing, pH measurements, and chemical synthesis.</div>
+                    </div>
+                    <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+                    <div class="slot">
+                        <div class="slot-time">01:00 PM - 02:00 PM</div>
+                        <div class="slot-title">CHM1001 • Engineering Chemistry</div>
+                        <div class="slot-meta">Prof. Piyali Paul (PP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Covers atomic structure, spectroscopy, thermodynamics, electrochemistry, and industrial materials.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">02:00 PM - 03:00 PM</div>
+                        <div class="slot-title">HUM1001 • Technical English</div>
+                        <div class="slot-meta">Prof. Dr. Aditi Bhunia Chakraborty (ABC) • Room ICT004</div>
+                        <div class="slot-desc">📌 Report writing, official email etiquette, and developing active listening and speaking proficiency.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">03:00 PM - 04:00 PM</div>
+                        <div class="slot-title">CSE1001 • C Programming Lecture</div>
+                        <div class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Theoretical logic: data types, control flow structures, memory management, and algorithm design.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">04:00 PM - 05:00 PM</div>
+                        <div class="slot-title">ELE1001 • Electrical Tutorial</div>
+                        <div class="slot-meta">Prof. Suvobrata Sil (SBS) • Room ICT109</div>
+                        <div class="slot-desc">📌 Small-group problem-solving session for numerical problems in circuit laws and AC machines.</div>
+                    </div>
+                </div>
+
+                <!-- WEDNESDAY -->
+                <div id="day-wed" class="day-content hidden">
+                    <div class="slot">
+                        <div class="slot-time">09:00 AM - 10:00 AM</div>
+                        <div class="slot-title">CSE1001 • C Programming</div>
+                        <div class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Arrays, strings, and multi-dimensional array operations with practical pseudo-code examples.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">10:00 AM - 11:00 AM</div>
+                        <div class="slot-title">CHM1001 • Engineering Chemistry</div>
+                        <div class="slot-meta">Prof. Dr. Dulal Chandra Mukherjee (DCM) • Room ICT004</div>
+                        <div class="slot-desc">📌 Chemical kinetics, reaction mechanisms, polymer chemistry, and green chemistry principles.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">11:00 AM - 12:00 PM</div>
+                        <div class="slot-title">ELE1001 • Basic Electrical Engg</div>
+                        <div class="slot-meta">Prof. Anirban Kolay (AK) • Room ICT004</div>
+                        <div class="slot-desc">📌 Analysis of 3-phase AC systems, star-delta transformations, and basic magnetic circuits.</div>
+                    </div>
+                    <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+                    <div class="slot">
+                        <div class="slot-time">01:00 PM - 02:00 PM</div>
+                        <div class="slot-title">CHM1001 • Engineering Chemistry</div>
+                        <div class="slot-meta">Prof. Dr. Enakshi Dinda (ED) • Room ICT004</div>
+                        <div class="slot-desc">📌 Phase rule, fuels & combustion metrics, lubricants, and corrosion prevention methods.</div>
+                    </div>
+                    <div class="slot gr1-only">
+                        <div class="slot-time">02:00 PM - 05:00 PM</div>
+                        <div class="slot-title">CSE1051 • C Programming Lab</div>
+                        <div class="slot-meta">ANP / KM / SKD • Room ICTB03</div>
+                        <div class="slot-desc">📌 Coding lab exercise focused on dynamic memory allocation, file handling, and nested structures.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">02:00 PM - 03:00 PM</div>
+                        <div class="slot-title">MTH1101 • Math Tutorial</div>
+                        <div class="slot-meta">Prof. Dr. Sudipta Sarkar (SDS) • Room ICT109</div>
+                        <div class="slot-desc">📌 Step-by-step math problem solving, homework clearing, and exam preparation tricks.</div>
+                    </div>
+                </div>
+
+                <!-- THURSDAY -->
+                <div id="day-thu" class="day-content hidden">
+                    <div class="slot">
+                        <div class="slot-time">09:00 AM - 10:00 AM</div>
+                        <div class="slot-title">CHM1001 • Engineering Chemistry</div>
+                        <div class="slot-meta">Prof. Piyali Paul (PP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Spectroscopic techniques (UV-Vis, IR) and structural characterization of organic compounds.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">10:00 AM - 11:00 AM</div>
+                        <div class="slot-title">CSE1001 • C Programming</div>
+                        <div class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Pointers, memory addresses, call by value/reference, and function recursion.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">11:00 AM - 12:00 PM</div>
+                        <div class="slot-title">MTH1101 • Mathematics-IB</div>
+                        <div class="slot-meta">Prof. Dr. Ashesh Paul (AP) • Room ICT004</div>
+                        <div class="slot-desc">📌 Differential equations of first order, higher-order linear ODEs with constant coefficients.</div>
+                    </div>
+                    <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+                    <div class="slot">
+                        <div class="slot-time">01:00 PM - 02:00 PM</div>
+                        <div class="slot-title">ELE1001 • Basic Electrical Engg</div>
+                        <div class="slot-meta">Prof. Suvobrata Sil (SBS) • Room ICT004</div>
+                        <div class="slot-desc">📌 Electrical machines overview: single-phase transformers, DC motors, and safety systems.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">02:00 PM - 03:00 PM</div>
+                        <div class="slot-title">CSE1001 • C Programming</div>
+                        <div class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</div>
+                        <div class="slot-desc">📌 User-defined data types, structures, unions, and introductory data storage models.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">03:00 PM - 04:00 PM</div>
+                        <div class="slot-title">Remedial Class</div>
+                        <div class="slot-meta">Room ICT004</div>
+                        <div class="slot-desc">📌 Doubt-clearing session for students needing extra practice on tough semester concepts.</div>
+                    </div>
+                </div>
+
+                <!-- FRIDAY -->
+                <div id="day-fri" class="day-content hidden">
+                    <div class="slot gr1-only">
+                        <div class="slot-time">09:00 AM - 11:00 AM</div>
+                        <div class="slot-title">ELE1051 • Electrical Lab</div>
+                        <div class="slot-meta">SBS / SBH / BM • Room CME408</div>
+                        <div class="slot-desc">📌 Practical verification of KVL/KCL, Thevenin theorem, transformer load test, and energy meter calibration.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">09:00 AM - 11:00 AM</div>
+                        <div class="slot-title">ELE1051 • Electrical Lab</div>
+                        <div class="slot-meta">AK / SK / TDK • Room CME415</div>
+                        <div class="slot-desc">📌 Practical verification of KVL/KCL, Thevenin theorem, transformer load test, and energy meter calibration.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">11:00 AM - 12:00 PM</div>
+                        <div class="slot-title">Soft Skills</div>
+                        <div class="slot-meta">Mr. Clayton Moses (CMM) • Room CB616</div>
+                        <div class="slot-desc">📌 Personality development, body language training, group discussion tactics, and interview preparation.</div>
+                    </div>
+                    <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+                    <div class="slot">
+                        <div class="slot-time">01:00 PM - 02:00 PM</div>
+                        <div class="slot-title">MTH1101 • Math Tutorial</div>
+                        <div class="slot-meta">SDS • Room ICT105</div>
+                        <div class="slot-desc">📌 Intensive problem sheet solving for multivariable integrals and series.</div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-time">02:00 PM - 03:00 PM</div>
+                        <div class="slot-title">ELE1001 • Electrical Tutorial</div>
+                        <div class="slot-meta">SBS • Room ICT105</div>
+                        <div class="slot-desc">📌 Practice problems on AC circuits, power factor calculations, and phasor diagrams.</div>
+                    </div>
+                    <div class="slot gr1-only">
+                        <div class="slot-time">03:00 PM - 05:00 PM</div>
+                        <div class="slot-title">HUM1051 • Language Lab</div>
+                        <div class="slot-meta">SC / SB • Room CB514</div>
+                        <div class="slot-desc">📌 Computer-assisted audio-visual lab for English phonetics, accent training, and speech fluency.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">02:00 PM - 03:00 PM</div>
+                        <div class="slot-title">Mentoring Session</div>
+                        <div class="slot-desc">📌 Interactive session on academic tracking and personal development.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">03:00 PM - 04:00 PM</div>
+                        <div class="slot-title">Library Hour</div>
+                        <div class="slot-desc">📌 Self-study and research session at the campus library.</div>
+                    </div>
+                    <div class="slot gr2-only">
+                        <div class="slot-time">04:00 PM - 06:00 PM</div>
+                        <div class="slot-title">HUM1051 • Language Lab</div>
+                        <div class="slot-meta">KGT / SM • Room CME007</div>
+                        <div class="slot-desc">📌 Audio-visual language lab exercises focusing on phonetics, pronunciation, and dialogue skills.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function bootSystem() {
+            const led = document.getElementById('main-led');
+            led.classList.add('on');
+            
+            setTimeout(() => {
+                document.getElementById('landing-screen').classList.add('hidden');
+                const app = document.getElementById('app-content');
+                app.classList.remove('hidden');
+                app.classList.add('circuit-connecting');
+            }, 300);
+        }
+
+        function setGroup(groupNum) {
+            const btn1 = document.getElementById('btn-gr1');
+            const btn2 = document.getElementById('btn-gr2');
+            
+            if (groupNum === 1) {
+                document.body.className = 'show-gr1';
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
+            } else {
