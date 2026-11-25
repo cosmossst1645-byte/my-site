@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEIE 1st Sem Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f4fbf7;
+            --matcha-bg: #d8f3dc;
+            --matcha-card: #e8f5e9;
+            --skyblue-bg: #e0f2fe;
+            --skyblue-card: #f0f9ff;
+            --accent-green: #74c69d;
+            --accent-blue: #38bdf8;
+            --text-dark: #0f172a;
+            --border-black: #1e293b;
+            --card-shadow: 4px 4px 0px #1e293b;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 16px;
+            max-width: 650px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: var(--matcha-bg);
+            border: 2px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        header h1 {
+            font-size: 1.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2d6a4f;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .group-btn {
+            background: #ffffff;
+            border: 2px solid var(--border-black);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--border-black);
+            transition: all 0.2s ease;
+        }
+
+        .group-btn.active {
+            background: var(--accent-blue);
+            color: #fff;
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--border-black);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 24px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-card {
+            background: var(--skyblue-card);
+            border: 2px solid var(--border-black);
+            box-shadow: var(--card-shadow);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .day-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .day-header {
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            border-bottom: 2px dashed var(--border-black);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slot {
+            display: flex;
+            flex-direction: column;
+            background: var(--matcha-card);
+            border: 2px solid var(--border-black);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        .slot:last-child {
+            margin-bottom: 0;
+        }
+
+        .slot-time {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #1b4332;
+            margin-bottom: 4px;
+        }
+
+        .slot-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .slot-meta {
+            font-size: 0.78rem;
+            color: #475569;
+            margin-top: 2px;
+        }
+
+        .break-slot {
+            background: #fff;
+            border: 2px dashed var(--border-black);
+            text-align: center;
+            padding: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .faculty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+        }
+
+        .faculty-card {
+            background: var(--matcha-bg);
+            border: 2px solid var(--border-black);
+            border-radius: 12px;
+            padding: 8px 10px;
+            box-shadow: 2px 2px 0px var(--border-black);
+            font-size: 0.78rem;
+        }
+
+        .faculty-code {
+            font-weight: 800;
+            color: #1b4332;
+        }
+
+        .faculty-name {
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+
+        /* Group Toggle Logic */
+        .gr1-only, .gr2-only { display: none; }
+        body.show-gr1 .gr1-only { display: flex; }
+        body.show-gr2 .gr2-only { display: flex; }
+        body.show-gr1 .gr1-block { display: block; }
+        body.show-gr2 .gr2-block { display: block; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="show-gr1">
+
+    <header>
+        <h1>Heritage Institute of Technology</h1>
+        <p>AEIE • 1st Year 1st Semester (2026-2027)</p>
+    </header>
+
+    <div class="toggle-container">
+        <button class="group-btn active" id="btn-gr1" onclick="setGroup(1)">Group 1</button>
+        <button class="group-btn" id="btn-gr2" onclick="setGroup(2)">Group 2</button>
+    </div>
+
+    <div class="section-title">📅 Class Schedule</div>
+
+    <!-- MONDAY -->
+    <div class="day-card">
+        <div class="day-header"><span>Monday</span> <span>Mon</span></div>
+        <div class="slot">
+            <span class="slot-time">09:00 AM - 10:00 AM</span>
+            <span class="slot-title">ELE1001 (Basic Electrical Engg)</span>
+            <span class="slot-meta">Prof. Anirban Kolay (AK) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">10:00 AM - 11:00 AM</span>
+            <span class="slot-title">MTH1101 (Mathematics-IB)</span>
+            <span class="slot-meta">Prof. Dr. Sudipta Sarkar (SDS) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">11:00 AM - 12:00 PM</span>
+            <span class="slot-title">HUM1001 (English)</span>
+            <span class="slot-meta">Prof. Koyel Mallick (KM) • Room ICT004</span>
+        </div>
+        <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+        <div class="slot">
+            <span class="slot-time">01:00 PM - 02:00 PM</span>
+            <span class="slot-title">MTH1101 (Mathematics-IB)</span>
+            <span class="slot-meta">Prof. Dr. Ashesh Paul (AP) • Room ICT004</span>
+        </div>
+        <div class="slot gr1-only">
+            <span class="slot-time">02:00 PM - 03:00 PM</span>
+            <span class="slot-title">Mentoring</span>
+        </div>
+        <div class="slot gr1-only">
+            <span class="slot-time">03:00 PM - 04:00 PM</span>
+            <span class="slot-title">Library</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">02:00 PM - 05:00 PM</span>
+            <span class="slot-title">CSE1051 Lab (C Programming)</span>
+            <span class="slot-meta">ANP / SBJ / SKD • Room ICTB01</span>
+        </div>
+    </div>
+
+    <!-- TUESDAY -->
+    <div class="day-card">
+        <div class="day-header"><span>Tuesday</span> <span>Tue</span></div>
+        <div class="slot gr1-only">
+            <span class="slot-time">09:00 AM - 12:00 PM</span>
+            <span class="slot-title">CHM1051 Lab (Chemistry Lab)</span>
+            <span class="slot-meta">Prof. Piyali Paul (PP) / HS • Room CB101</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">09:00 AM - 12:00 PM</span>
+            <span class="slot-title">CHM1051 Lab (Chemistry Lab)</span>
+            <span class="slot-meta">Prof. Sangeeta Ghosh (SG) / SKM • Room CB102</span>
+        </div>
+        <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+        <div class="slot">
+            <span class="slot-time">01:00 PM - 02:00 PM</span>
+            <span class="slot-title">CHM1001 (Chemistry)</span>
+            <span class="slot-meta">Prof. Piyali Paul (PP) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">02:00 PM - 03:00 PM</span>
+            <span class="slot-title">HUM1001 (English)</span>
+            <span class="slot-meta">Prof. Dr. Aditi Bhunia Chakraborty (ABC) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">03:00 PM - 04:00 PM</span>
+            <span class="slot-title">CSE1001 (C Programming)</span>
+            <span class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">04:00 PM - 05:00 PM</span>
+            <span class="slot-title">ELE1001 Tutorial</span>
+            <span class="slot-meta">Prof. Suvobrata Sil (SBS) • Room ICT109</span>
+        </div>
+    </div>
+
+    <!-- WEDNESDAY -->
+    <div class="day-card">
+        <div class="day-header"><span>Wednesday</span> <span>Wed</span></div>
+        <div class="slot">
+            <span class="slot-time">09:00 AM - 10:00 AM</span>
+            <span class="slot-title">CSE1001 (C Programming)</span>
+            <span class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">10:00 AM - 11:00 AM</span>
+            <span class="slot-title">CHM1001 (Chemistry)</span>
+            <span class="slot-meta">Prof. Dr. Dulal Chandra Mukherjee (DCM) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">11:00 AM - 12:00 PM</span>
+            <span class="slot-title">ELE1001 (Basic Electrical Engg)</span>
+            <span class="slot-meta">Prof. Anirban Kolay (AK) • Room ICT004</span>
+        </div>
+        <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+        <div class="slot">
+            <span class="slot-time">01:00 PM - 02:00 PM</span>
+            <span class="slot-title">CHM1001 (Chemistry)</span>
+            <span class="slot-meta">Prof. Dr. Enakshi Dinda (ED) • Room ICT004</span>
+        </div>
+        <div class="slot gr1-only">
+            <span class="slot-time">02:00 PM - 05:00 PM</span>
+            <span class="slot-title">CSE1051 Lab (C Programming)</span>
+            <span class="slot-meta">ANP / KM / SKD • Room ICTB03</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">02:00 PM - 03:00 PM</span>
+            <span class="slot-title">MTH1101 Tutorial</span>
+            <span class="slot-meta">Prof. Dr. Sudipta Sarkar (SDS) • Room ICT109</span>
+        </div>
+    </div>
+
+    <!-- THURSDAY -->
+    <div class="day-card">
+        <div class="day-header"><span>Thursday</span> <span>Thu</span></div>
+        <div class="slot">
+            <span class="slot-time">09:00 AM - 10:00 AM</span>
+            <span class="slot-title">CHM1001 (Chemistry)</span>
+            <span class="slot-meta">Prof. Piyali Paul (PP) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">10:00 AM - 11:00 AM</span>
+            <span class="slot-title">CSE1001 (C Programming)</span>
+            <span class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">11:00 AM - 12:00 PM</span>
+            <span class="slot-title">MTH1101 (Mathematics-IB)</span>
+            <span class="slot-meta">Prof. Dr. Ashesh Paul (AP) • Room ICT004</span>
+        </div>
+        <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+        <div class="slot">
+            <span class="slot-time">01:00 PM - 02:00 PM</span>
+            <span class="slot-title">ELE1001 (Basic Electrical Engg)</span>
+            <span class="slot-meta">Prof. Suvobrata Sil (SBS) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">02:00 PM - 03:00 PM</span>
+            <span class="slot-title">CSE1001 (C Programming)</span>
+            <span class="slot-meta">Dr. Anastuv Pal (ANP) • Room ICT004</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">03:00 PM - 04:00 PM</span>
+            <span class="slot-title">Remedial Class</span>
+            <span class="slot-meta">Room ICT004</span>
+        </div>
+    </div>
+
+    <!-- FRIDAY -->
+    <div class="day-card">
+        <div class="day-header"><span>Friday</span> <span>Fri</span></div>
+        <div class="slot gr1-only">
+            <span class="slot-time">09:00 AM - 11:00 AM</span>
+            <span class="slot-title">ELE1051 Lab (Electrical Lab)</span>
+            <span class="slot-meta">SBS / SBH / BM • Room CME408</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">09:00 AM - 11:00 AM</span>
+            <span class="slot-title">ELE1051 Lab (Electrical Lab)</span>
+            <span class="slot-meta">AK / SK / TDK • Room CME415</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">11:00 AM - 12:00 PM</span>
+            <span class="slot-title">Soft Skills</span>
+            <span class="slot-meta">Mr. Clayton Moses (CMM) • Room CB616</span>
+        </div>
+        <div class="break-slot">☕ BREAK (12:00 PM - 01:00 PM)</div>
+        <div class="slot">
+            <span class="slot-time">01:00 PM - 02:00 PM</span>
+            <span class="slot-title">MTH1101 Tutorial</span>
+            <span class="slot-meta">SDS • Room ICT105</span>
+        </div>
+        <div class="slot">
+            <span class="slot-time">02:00 PM - 03:00 PM</span>
+            <span class="slot-title">ELE1001 Tutorial</span>
+            <span class="slot-meta">SBS • Room ICT105</span>
+        </div>
+        <div class="slot gr1-only">
+            <span class="slot-time">03:00 PM - 05:00 PM</span>
+            <span class="slot-title">HUM1051 Lab (Language Lab)</span>
+            <span class="slot-meta">SC / SB • Room CB514</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">02:00 PM - 03:00 PM</span>
+            <span class="slot-title">Mentoring</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">03:00 PM - 04:00 PM</span>
+            <span class="slot-title">Library</span>
+        </div>
+        <div class="slot gr2-only">
+            <span class="slot-time">04:00 PM - 06:00 PM</span>
+            <span class="slot-title">HUM1051 Lab (Language Lab)</span>
+            <span class="slot-meta">KGT / SM • Room CME007</span>
+        </div>
+    </div>
+
+    <!-- FACULTY DETAILS SECTION -->
+    <div class="section-title">👨‍🏫 Faculty Key</div>
+    <div class="faculty-grid">
+        <div class="faculty-card"><div class="faculty-code">DCM</div><div class="faculty-name">Prof. (Dr.) Dulal Chandra Mukherjee</div></div>
+        <div class="faculty-card"><div class="faculty-code">ED</div><div class="faculty-name">Prof. (Dr.) Enakshi Dinda</div></div>
+        <div class="faculty-card"><div class="faculty-code">PP</div><div class="faculty-name">Prof. (Dr.) Piyali Paul</div></div>
+        <div class="faculty-card"><div class="faculty-code">SG</div><div class="faculty-name">Prof. (Dr.) Sangeeta Ghosh</div></div>
+        <div class="faculty-card"><div class="faculty-code">AK</div><div class="faculty-name">Prof. Anirban Kolay</div></div>
+        <div class="faculty-card"><div class="faculty-code">SBS</div><div class="faculty-name">Prof. Suvobrata Sil</div></div>
+        <div class="faculty-card"><div class="faculty-code">SC</div><div class="faculty-name">Prof. (Dr.) Suparna Chakraborty</div></div>
+        <div class="faculty-card"><div class="faculty-code">ABC</div><div class="faculty-name">Prof. (Dr.) Aditi Bhunia Chakraborty</div></div>
+        <div class="faculty-card"><div class="faculty-code">KGT</div><div class="faculty-name">Prof. (Dr.) Kasturi Guha Thakurata</div></div>
+        <div class="faculty-card"><div class="faculty-code">KM</div><div class="faculty-name">Prof. Koyel Mallick</div></div>
+        <div class="faculty-card"><div class="faculty-code">AP</div><div class="faculty-name">Prof. (Dr.) Ashesh Paul</div></div>
+        <div class="faculty-card"><div class="faculty-code">SDS</div><div class="faculty-name">Prof. (Dr.) Sudipta Sarkar</div></div>
+        <div class="faculty-card"><div class="faculty-code">ANP</div><div class="faculty-name">Dr. Anastuv Pal</div></div>
+        <div class="faculty-card"><div class="faculty-code">CMM</div><div class="faculty-name">Mr. Clayton Moses</div></div>
+    </div>
+
+    <script>
+        function setGroup(groupNum) {
+            const btn1 = document.getElementById('btn-gr1');
+            const btn2 = document.getElementById('btn-gr2');
+            
+            if (groupNum === 1) {
+                document.body.className = 'show-gr1';
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
+            } else {
+                document.body.className = 'show-gr2';
+                btn2.classList.add('active');
+                btn1.classList.add('active');
+                btn1.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
