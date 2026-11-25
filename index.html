@@ -68,6 +68,7 @@
             stroke-linejoin: round;
             stroke-dasharray: 12 8;
             animation: flowTrace 9s linear infinite;
+            transition: stroke 0.3s ease, filter 0.3s ease;
         }
 
         .trace-line.blue {
@@ -121,7 +122,6 @@
             padding: 34px 20px;
         }
 
-        /* Mounting holes on PCB corners */
         .mounting-hole {
             position: absolute;
             width: 14px;
@@ -136,7 +136,6 @@
         .mh-bl { bottom: 10px; left: 10px; }
         .mh-br { bottom: 10px; right: 10px; }
 
-        /* Decorative SMD resistors & capacitors on PCB */
         .smd-part {
             position: absolute;
             background: #334155;
@@ -181,7 +180,6 @@
             margin-bottom: 14px;
         }
 
-        /* Main clickable IC button */
         #aeie-power-btn {
             position: relative;
             width: 100%;
@@ -209,7 +207,6 @@
             background: var(--matcha-card);
         }
 
-        /* IC Chip notch */
         .ic-notch {
             position: absolute;
             top: -2px;
@@ -225,7 +222,6 @@
             border-bottom-right-radius: 12px;
         }
 
-        /* Top & bottom IC pins */
         .ic-pin-row {
             display: flex;
             justify-content: space-between;
@@ -284,6 +280,7 @@
             font-size: 0.85rem;
             font-weight: 900;
             letter-spacing: 0.6px;
+            text-align: center;
         }
 
         /* =========================================================
@@ -296,7 +293,6 @@
             box-shadow: var(--shadow-pcb);
             padding: 14px 16px;
             margin-bottom: 14px;
-            position: relative;
         }
 
         .top-banner-row {
@@ -358,9 +354,9 @@
 
         .endsem-bright-red {
             color: var(--bright-red);
-            font-size: clamp(1.15rem, 4.8vw, 1.55rem);
+            font-size: clamp(1.1rem, 4.5vw, 1.5rem);
             font-weight: 900;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             text-shadow: 0 0 10px rgba(255, 30, 30, 0.75);
         }
 
@@ -461,6 +457,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
             transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.2s ease;
         }
 
@@ -484,6 +481,7 @@
         .node-pad {
             width: 16px;
             height: 16px;
+            flex-shrink: 0;
             border-radius: 50%;
             background: var(--gold-pad);
             border: 2.5px solid var(--ink);
@@ -508,6 +506,7 @@
             border: 2px solid var(--ink);
             border-radius: 8px;
             padding: 4px 10px;
+            white-space: nowrap;
         }
 
         /* CIRCUIT CONNECTION PULSE BAR */
@@ -583,7 +582,6 @@
             background: var(--sky-card);
         }
 
-        /* Corner solder vias */
         .via-dot {
             position: absolute;
             top: 10px;
@@ -744,7 +742,7 @@
             <div class="endsem-alert-box">
                 <div class="endsem-label">🚨 END-SEMESTER EXAM COUNTDOWN 🚨</div>
                 <div class="endsem-bright-red" id="endsem-countdown-text">LOADING...</div>
-                <div class="endsem-date-note">Target: Dec 15, 2026 (Edit date in script anytime)</div>
+                <div class="endsem-date-note">Target: Dec 15, 2026 (Edit ENDSEM_TARGET in script anytime)</div>
             </div>
 
             <!-- LIVE CLOCK & TIME UNTIL NEXT CLASS -->
@@ -1110,7 +1108,7 @@
 
                     <div class="class-pcb-card only-gr2">
                         <span class="via-dot"></span>
-                        <div class="slot-time-pill">02:00 PM – 03:00 PM</div>
+                        <div class="slot-time-pill">03:00 PM – 04:00 PM</div>
                         <div class="slot-subject">Mentoring Session (Gr. 2)</div>
                         <div class="slot-faculty-room">Faculty Mentor • AEIE</div>
                         <div class="slot-description">Guidance session covering academic progress, lab prep, and semester goals.</div>
@@ -1118,6 +1116,174 @@
 
                     <div class="class-pcb-card only-gr2">
                         <span class="via-dot"></span>
-                        <div class="slot-time-pill">03:00 PM – 04:00 PM</div>
+                        <div class="slot-time-pill">04:00 PM – 05:00 PM</div>
                         <div class="slot-subject">Library Hour (Gr. 2)</div>
                         <div class="slot-faculty-room">Central / Dept Library</div>
+                        <div class="slot-description">Dedicated reading and self-study block for reference books, notes, and problem sheets.</div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            // =========================================================
+            // CONFIGURATION (EDIT END-SEM DATE HERE ANYTIME)
+            // =========================================================
+            const ENDSEM_TARGET = new Date("2026-12-15T09:00:00+05:30").getTime();
+
+            const DAY_META = {
+                mon: { name: "Monday", node: "NODE-01", dayIndex: 1 },
+                tue: { name: "Tuesday", node: "NODE-02", dayIndex: 2 },
+                wed: { name: "Wednesday", node: "NODE-03", dayIndex: 3 },
+                thu: { name: "Thursday", node: "NODE-04", dayIndex: 4 },
+                fri: { name: "Friday", node: "NODE-05", dayIndex: 5 }
+            };
+
+            // Schedule data used by the live "Next Class" calculator
+            // times in 24h "HH:MM", groups: "all" | 1 | 2
+            const WEEKLY_CLASSES = {
+                1: [
+                    { start: "09:00", end: "10:00", title: "ELE1001 • Basic Electrical Engineering", room: "ICT004", group: "all" },
+                    { start: "10:00", end: "11:00", title: "MTH1101 • Mathematics-IB", room: "ICT004", group: "all" },
+                    { start: "11:00", end: "12:00", title: "HUM1001 • English / Humanities", room: "ICT004", group: "all" },
+                    { start: "13:00", end: "14:00", title: "MTH1101 • Mathematics-IB", room: "ICT004", group: "all" },
+                    { start: "14:00", end: "15:00", title: "Mentoring Session (Gr. 1)", room: "AEIE", group: 1 },
+                    { start: "15:00", end: "16:00", title: "Library Hour (Gr. 1)", room: "Library", group: 1 },
+                    { start: "14:00", end: "17:00", title: "CSE1051 • C Programming Lab (Gr. 2)", room: "ICTB01", group: 2 }
+                ],
+                2: [
+                    { start: "09:00", end: "12:00", title: "CHM1051 • Chemistry Lab (Gr. 1)", room: "CB101", group: 1 },
+                    { start: "09:00", end: "12:00", title: "CHM1051 • Chemistry Lab (Gr. 2)", room: "CB102", group: 2 },
+                    { start: "13:00", end: "14:00", title: "CHM1001 • Engineering Chemistry", room: "ICT004", group: "all" },
+                    { start: "14:00", end: "15:00", title: "HUM1001 • English / Humanities", room: "ICT004", group: "all" },
+                    { start: "15:00", end: "16:00", title: "CSE1001 • C Programming", room: "ICT004", group: "all" },
+                    { start: "16:00", end: "17:00", title: "ELE1001 Tutorial (Gr. 2)", room: "ICT109", group: 2 }
+                ],
+                3: [
+                    { start: "09:00", end: "10:00", title: "CSE1001 • C Programming", room: "ICT004", group: "all" },
+                    { start: "10:00", end: "11:00", title: "CHM1001 • Engineering Chemistry", room: "ICT004", group: "all" },
+                    { start: "11:00", end: "12:00", title: "ELE1001 • Basic Electrical Engineering", room: "ICT004", group: "all" },
+                    { start: "13:00", end: "14:00", title: "CHM1001 • Engineering Chemistry", room: "ICT004", group: "all" },
+                    { start: "14:00", end: "17:00", title: "CSE1051 • C Programming Lab (Gr. 1)", room: "ICTB03", group: 1 },
+                    { start: "14:00", end: "15:00", title: "MTH1101 Tutorial (Gr. 2)", room: "ICT109", group: 2 }
+                ],
+                4: [
+                    { start: "09:00", end: "10:00", title: "CHM1001 • Engineering Chemistry", room: "ICT004", group: "all" },
+                    { start: "10:00", end: "11:00", title: "CSE1001 • C Programming", room: "ICT004", group: "all" },
+                    { start: "11:00", end: "12:00", title: "MTH1101 • Mathematics-IB", room: "ICT004", group: "all" },
+                    { start: "13:00", end: "14:00", title: "ELE1001 • Basic Electrical Engineering", room: "ICT004", group: "all" },
+                    { start: "14:00", end: "15:00", title: "CSE1001 • C Programming", room: "ICT004", group: "all" },
+                    { start: "15:00", end: "16:00", title: "Remedial Class", room: "ICT004", group: "all" }
+                ],
+                5: [
+                    { start: "09:00", end: "11:00", title: "ELE1051 • Electrical Lab (Gr. 1)", room: "CME408", group: 1 },
+                    { start: "09:00", end: "11:00", title: "ELE1051 • Electrical Lab (Gr. 2)", room: "CME415", group: 2 },
+                    { start: "11:00", end: "12:00", title: "Soft Skill", room: "CB616", group: "all" },
+                    { start: "13:00", end: "14:00", title: "T1 / MTH1101 Tutorial", room: "ICT105", group: "all" },
+                    { start: "14:00", end: "15:00", title: "T1 / ELE1001 Tutorial", room: "ICT105", group: "all" },
+                    { start: "15:00", end: "17:00", title: "HUM1051 • Language Lab (Gr. 1)", room: "CB514", group: 1 },
+                    { start: "15:00", end: "16:00", title: "Mentoring Session (Gr. 2)", room: "AEIE", group: 2 },
+                    { start: "16:00", end: "17:00", title: "Library Hour (Gr. 2)", room: "Library", group: 2 }
+                ]
+            };
+
+            // =========================================================
+            // DOM REFERENCES
+            // =========================================================
+            const landingStage = document.getElementById("landing-stage");
+            const dashboardStage = document.getElementById("dashboard-stage");
+            const daysMenuStage = document.getElementById("days-menu-stage");
+            const dayDetailStage = document.getElementById("day-detail-stage");
+
+            const aeiePowerBtn = document.getElementById("aeie-power-btn");
+            const chipLed = document.getElementById("chip-led");
+            const chipLedLabel = document.getElementById("chip-led-label");
+            const returnChipBtn = document.getElementById("return-chip-btn");
+
+            const group1Btn = document.getElementById("group-1-btn");
+            const group2Btn = document.getElementById("group-2-btn");
+            const circuitFill = document.getElementById("circuit-fill");
+
+            const dayNodes = document.querySelectorAll(".day-pcb-node");
+            const backToDaysBtn = document.getElementById("back-to-days-btn");
+            const selectedDayBadge = document.getElementById("selected-day-badge");
+            const schedulePanels = document.querySelectorAll(".day-schedule-panel");
+            const traceLines = document.querySelectorAll(".trace-line");
+
+            const endsemCountdownEl = document.getElementById("endsem-countdown-text");
+            const liveClockEl = document.getElementById("live-digital-clock");
+            const nextClassTitleEl = document.getElementById("next-class-title");
+            const nextClassTimerEl = document.getElementById("next-class-timer");
+
+            let currentGroup = 1;
+            let activeDayKey = null;
+            let bootTimer = null;
+            let nodeTimer = null;
+
+            // =========================================================
+            // NAVIGATION: STAGE 1 <-> STAGE 2 <-> STAGE 3
+            // =========================================================
+            function setTracesEnergized(active) {
+                traceLines.forEach(line => {
+                    line.classList.toggle("energized", active);
+                });
+            }
+
+            function powerOnAEIE() {
+                if (bootTimer) clearTimeout(bootTimer);
+                aeiePowerBtn.classList.add("pressed");
+                chipLed.classList.add("active");
+                chipLedLabel.textContent = "ENERGIZED • BOOTING NODES...";
+                setTracesEnergized(true);
+
+                bootTimer = setTimeout(() => {
+                    landingStage.classList.add("hidden");
+                    dashboardStage.classList.remove("hidden");
+                    showDaysMenu();
+                    aeiePowerBtn.classList.remove("pressed");
+                }, 220);
+            }
+
+            function returnToStandby() {
+                if (bootTimer) clearTimeout(bootTimer);
+                if (nodeTimer) clearTimeout(nodeTimer);
+                dashboardStage.classList.add("hidden");
+                landingStage.classList.remove("hidden");
+                chipLed.classList.remove("active");
+                chipLedLabel.textContent = "STANDBY • TAP TO ENERGIZE";
+                setTracesEnergized(false);
+                circuitFill.classList.remove("powered");
+                activeDayKey = null;
+            }
+
+            function showDaysMenu() {
+                activeDayKey = null;
+                dayDetailStage.classList.add("hidden");
+                daysMenuStage.classList.remove("hidden");
+                schedulePanels.forEach(panel => panel.classList.add("hidden"));
+                circuitFill.classList.remove("powered");
+            }
+
+            function openDaySchedule(dayKey, clickedNode) {
+                const meta = DAY_META[dayKey];
+                if (!meta) return;
+
+                if (clickedNode) {
+                    clickedNode.classList.add("linking");
+                }
+                circuitFill.classList.add("powered");
+
+                if (nodeTimer) clearTimeout(nodeTimer);
+                nodeTimer = setTimeout(() => {
+                    if (clickedNode) {
+                        clickedNode.classList.remove("linking");
+                    }
+                    activeDayKey = dayKey;
+                    daysMenuStage.classList.add("hidden");
+                    dayDetailStage.classList.remove("hidden");
+                    selectedDayBadge.textContent = `${meta.node} • ${meta.name.toUpperCase()}`;
+
+                    schedulePanels.forEach(panel => {
